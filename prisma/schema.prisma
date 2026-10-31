@@ -1,0 +1,364 @@
+// Tenurage: the AI-run estate and letting agency.
+// Changing the database: edit this file, then `npm run db:migrate` to write a
+// migration (make it safe to re-run), and commit both. CI checks they match.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN // runs the agency: settings, team, integrations
+  NEGOTIATOR // day to day: properties, applicants, viewings
+}
+
+model Agency {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  phone     String?
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users        User[]
+  properties   Property[]
+  applicants   Applicant[]
+  viewings     Viewing[]
+  campaigns    ViewingCampaign[]
+  linkbot      Linkbot?
+  linkbotJobs  LinkbotAction[]
+  smsMessages  SmsMessage[]
+  documents    Document[]
+  integrations Integration[]
+  auditEvents  AuditEvent[]
+  botMessages  BotMessage[]
+}
+
+model User {
+  id               String    @id @default(cuid())
+  agencyId         String
+  email            String    @unique
+  passwordHash     String
+  firstName        String
+  lastName         String
+  role             Role      @default(NEGOTIATOR)
+  /// Set by an admin: texts from it to the agency's Linkbot come from this person.
+  mobile           String?
+  /// Their Aultrum ID ("sub"), once linked.
+  aultrumSub       String?
+  sessionVersion   Int       @default(0)
+  failedLoginCount Int       @default(0)
+  lockedUntil      DateTime?
+  lastLoginAt      DateTime?
+  deactivatedAt    DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  agency      Agency          @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  linkbotJobs LinkbotAction[]
+  botMessages BotMessage[]
+
+  @@index([agencyId])
+}
+
+/// A property on the agency's books, for sale or to let.
+model Property {
+  id        String   @id @default(cuid())
+  agencyId  String
+  /// SALE | LET
+  market    String
+  address   String
+  postcode  String
+  /// house | flat | bungalow | other
+  kind      String   @default("house")
+  bedrooms  Int      @default(1)
+  /// Asking price (sale) or monthly rent (let), in pounds.
+  price     Int
+  /// AVAILABLE | UNDER_OFFER | LET_AGREED | SOLD | LET | WITHDRAWN
+  status    String   @default("AVAILABLE")
+  summary   String   @default("")
+  features  String[] @default([])
+  /// Where the property came from in Reapit, if it was synced.
+  reapitId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency    Agency            @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  viewings  Viewing[]
+  campaigns ViewingCampaign[]
+  documents Document[]
+
+  @@unique([agencyId, reapitId])
+  @@index([agencyId, status])
+}
+
+/// Someone looking to buy or rent.
+model Applicant {
+  id          String    @id @default(cuid())
+  agencyId    String
+  firstName   String
+  lastName    String
+  phone       String?
+  email       String?
+  /// SALE | LET
+  market      String
+  minBedrooms Int       @default(0)
+  /// Most they'll pay (sale) or monthly rent (let), in pounds.
+  maxPrice    Int
+  /// Postcode districts or towns they want, e.g. ["BS6", "BS7"].
+  areas       String[]  @default([])
+  /// ACTIVE | PAUSED | ARCHIVED
+  status      String    @default("ACTIVE")
+  notes       String    @default("")
+  /// They texted STOP: no texts until START.
+  smsOptOutAt DateTime?
+  reapitId    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  agency      Agency       @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  viewings    Viewing[]
+  smsMessages SmsMessage[]
+
+  @@unique([agencyId, reapitId])
+  @@index([agencyId, status])
+}
+
+/// A viewing slot at a property: offered, then booked by one applicant.
+model Viewing {
+  id              String    @id @default(cuid())
+  agencyId        String
+  propertyId      String
+  applicantId     String?
+  startAt         DateTime
+  endAt           DateTime
+  /// OPEN (no one yet) | BOOKED | DONE | NO_SHOW | CANCELLED
+  status          String    @default("OPEN")
+  /// Who booked it: "linkbot", "office" or "reapit".
+  bookedVia       String?
+  bookedAt        DateTime?
+  /// When Linkbot texted the reminder, and asked how it went.
+  reminderAt      DateTime?
+  feedbackAskedAt DateTime?
+  feedback        String?
+  /// 1 (not for me) to 5 (want to offer)
+  interest        Int?
+  campaignId      String?
+  reapitId        String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  agency    Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  property  Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  applicant Applicant? @relation(fields: [applicantId], references: [id], onDelete: SetNull)
+
+  @@index([agencyId, startAt])
+  @@index([propertyId, startAt])
+}
+
+/// Linkbot filling a property's open viewing slots: it texts matched
+/// applicants a few at a time; the first to reply YES with a code gets a slot.
+model ViewingCampaign {
+  id          String    @id @default(cuid())
+  agencyId    String
+  propertyId  String
+  /// RUNNING | DONE | STOPPED
+  status      String    @default("RUNNING")
+  /// filled | exhausted | stopped | expired
+  outcome     String?
+  wave        Int       @default(0)
+  waveSize    Int       @default(5)
+  waveGapMins Int       @default(30)
+  nextWaveAt  DateTime?
+  invited     Int       @default(0)
+  startedById String?
+  endedAt     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  agency   Agency          @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  property Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  invites  ViewingInvite[]
+
+  @@index([agencyId, status])
+}
+
+/// One applicant invited by Linkbot to book one of a property's slots.
+model ViewingInvite {
+  id          String    @id @default(cuid())
+  campaignId  String
+  applicantId String
+  code        String
+  /// SENT | BOOKED | DECLINED | CLOSED
+  status      String    @default("SENT")
+  viewingId   String?
+  createdAt   DateTime  @default(now())
+  answeredAt  DateTime?
+
+  campaign ViewingCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, applicantId])
+  @@index([code])
+}
+
+/// The agency's Linkbot: its texting agent, with a number of its own.
+model Linkbot {
+  id            String   @id @default(cuid())
+  agencyId      String   @unique
+  name          String   @default("Linkbot")
+  /// friendly | brief | formal
+  tone          String   @default("friendly")
+  enabled       Boolean  @default(true)
+  officeTexts   Boolean  @default(true)
+  waveSize      Int      @default(5)
+  waveGapMins   Int      @default(30)
+  /// Hours before a viewing to text a reminder.
+  reminderHours Int      @default(24)
+  number        String?
+  numberSid     String?
+  /// none | active | failed
+  numberStatus  String   @default("none")
+  numberError   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([number])
+}
+
+/// A job someone in the office asked Linkbot for by text, held for YES and its code.
+model LinkbotAction {
+  id        String    @id @default(cuid())
+  agencyId  String
+  userId    String
+  code      String
+  tool      String
+  input     Json
+  summary   String
+  /// pending | done | failed | cancelled | expired
+  status    String    @default("pending")
+  result    String?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  doneAt    DateTime?
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+}
+
+/// Every text in and out: with an applicant (applicantId) or office member (userId).
+model SmsMessage {
+  id          String   @id @default(cuid())
+  agencyId    String
+  applicantId String?
+  userId      String?
+  /// OUT | IN
+  direction   String
+  phone       String
+  body        String
+  code        String?
+  providerId  String?
+  /// SENT | FAILED | RECEIVED
+  status      String
+  createdAt   DateTime @default(now())
+
+  agency    Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  applicant Applicant? @relation(fields: [applicantId], references: [id], onDelete: SetNull)
+
+  @@index([agencyId, phone, createdAt])
+}
+
+/// A document drafted in Docs: property particulars, a viewing confirmation, a letter.
+model Document {
+  id          String   @id @default(cuid())
+  agencyId    String
+  propertyId  String?
+  /// particulars | viewing_confirmation | letter
+  kind        String
+  title       String
+  body        String
+  /// DRAFT | FINAL
+  status      String   @default("DRAFT")
+  /// template | ai
+  madeBy      String   @default("template")
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  agency   Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+
+  @@index([agencyId, createdAt])
+}
+
+/// A connection to another system: reapit, elements (Gateway), aultrum.
+model Integration {
+  id         String    @id @default(cuid())
+  agencyId   String
+  provider   String
+  /// CONNECTED | ERROR
+  status     String    @default("CONNECTED")
+  config     Json      @default("{}")
+  /// Credentials, sealed with AUTH_SECRET.
+  secrets    String?
+  lastSyncAt DateTime?
+  lastError  String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@unique([agencyId, provider])
+}
+
+/// The office's conversation with Bot.
+model BotMessage {
+  id        String   @id @default(cuid())
+  agencyId  String
+  userId    String
+  /// user | bot
+  role      String
+  body      String
+  /// A change Bot proposed, waiting for the person to approve it.
+  proposal  Json?
+  /// pending | approved | declined (for proposals)
+  status    String?
+  createdAt DateTime @default(now())
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  agencyId   String
+  actorId    String?
+  actorEmail String?
+  action     String
+  summary    String
+  targetType String?
+  targetId   String?
+  metadata   Json?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId, createdAt])
+}
+
+model ServiceKey {
+  name      String   @id
+  value     String
+  createdAt DateTime @default(now())
+}
