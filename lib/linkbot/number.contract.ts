@@ -17,9 +17,11 @@ let agencyId = "";
 let linkbotId = "";
 let approved = false;
 const bought: Record<string, string>[] = [];
+const auths: string[] = [];
 
 before(async () => {
   twilio = createServer((req, res) => {
+    auths.push(req.headers.authorization ?? "");
     let raw = "";
     req.on("data", (c) => (raw += c));
     req.on("end", () => {
@@ -70,4 +72,18 @@ test("once approved, the waiting Linkbot buys its number by itself under the dis
   assert.deepEqual([bought[0]?.BundleSid, bought[0]?.AddressSid], ["BUaultrum", "ADaultrum"]);
   assert.equal(bought[0]?.SmsUrl, `https://tenurage.test/api/webhooks/twilio/linkbot/${linkbotId}`);
   assert.equal((await smsSender(agencyId))?.from, "+447700900444");
+});
+
+test("with a Twilio API key set, requests to Twilio use it instead of the auth token", async () => {
+  process.env.TWILIO_API_KEY_SID = "SKlinkbot";
+  process.env.TWILIO_API_KEY_SECRET = "linkbot-secret";
+  try {
+    await prisma.linkbot.update({ where: { id: linkbotId }, data: { number: null, numberSid: null, numberStatus: "failed" } });
+    auths.length = 0;
+    assert.ok((await provisionNumber(linkbotId)).ok);
+    assert.ok(auths.length > 0 && auths.every((a) => a === `Basic ${Buffer.from("SKlinkbot:linkbot-secret").toString("base64")}`));
+  } finally {
+    delete process.env.TWILIO_API_KEY_SID;
+    delete process.env.TWILIO_API_KEY_SECRET;
+  }
 });

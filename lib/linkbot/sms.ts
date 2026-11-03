@@ -19,11 +19,18 @@ export interface SmsResult {
   reason?: string;
 }
 
-/** Aultrum's Twilio account (TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN): all texting needs. */
+/**
+ * Aultrum's Twilio account: TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN (the token
+ * checks that incoming texts come from Twilio). With TWILIO_API_KEY_SID and
+ * TWILIO_API_KEY_SECRET too, requests to Twilio use that API key instead.
+ */
 export function aultrumTwilio(): TwilioSecrets | null {
   const accountSid = process.env.TWILIO_ACCOUNT_SID?.trim();
   const authToken = process.env.TWILIO_AUTH_TOKEN?.trim();
-  return accountSid && authToken ? { accountSid, authToken } : null;
+  const apiKeySid = process.env.TWILIO_API_KEY_SID?.trim() || undefined;
+  const apiKeySecret = process.env.TWILIO_API_KEY_SECRET?.trim() || undefined;
+  if (!accountSid || !authToken) return null;
+  return apiKeySid && apiKeySecret ? { accountSid, authToken, apiKeySid, apiKeySecret } : { accountSid, authToken };
 }
 
 /** The optional shared number (TWILIO_FROM), used only until an agency's own number is bought. */

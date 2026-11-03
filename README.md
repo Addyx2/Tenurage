@@ -28,6 +28,7 @@ Checks: `npm run typecheck`, `npm run lint`, `npm test`, `npm run test:contract`
 | `AUTH_SECRET` | Sign-in sessions and sealing integration secrets. 32+ random characters. |
 | `APP_URL` | Links and Twilio webhooks, e.g. `https://tenurage.aultrum.co.uk`. |
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` | Linkbot texting. Tenurage buys each agency's UK mobile number itself, under the account's approved UK mobile regulatory bundle, which it finds through Twilio's API. |
+| `TWILIO_API_KEY_SID`, `TWILIO_API_KEY_SECRET` | Recommended: a Twilio API key (Console → Account → API keys & tokens → Create API key, Standard). Requests to Twilio use it instead of the auth token, which then only checks incoming texts. |
 | `TWILIO_FROM` | Optional: a shared number to text from until an agency's own number is bought. |
 | `ANTHROPIC_API_KEY` | Bot, Linkbot's replies, and AI-written Docs. Without it, the rest still works. |
 | `CRON_SECRET` | Optional: `/api/cron/linkbot` on a schedule. Linkbot also moves on whenever the office uses Tenurage or a text arrives. |
