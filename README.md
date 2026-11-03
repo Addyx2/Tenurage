@@ -27,8 +27,8 @@ Checks: `npm run typecheck`, `npm run lint`, `npm test`, `npm run test:contract`
 | `DATABASE_URL` | Everything. Migrations run on each deploy. |
 | `AUTH_SECRET` | Sign-in sessions and sealing integration secrets. 32+ random characters. |
 | `APP_URL` | Links and Twilio webhooks, e.g. `https://tenurage.aultrum.co.uk`. |
-| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` | Linkbot texting. `TWILIO_FROM` is the shared number used until an agency's own is bought. |
-| `TWILIO_BUNDLE_SID`, `TWILIO_ADDRESS_SID` | Buying each agency a UK mobile number (Ofcom regulatory bundle). |
+| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` | Linkbot texting. Tenurage buys each agency's UK mobile number itself, under the account's approved UK mobile regulatory bundle, which it finds through Twilio's API. |
+| `TWILIO_FROM` | Optional: a shared number to text from until an agency's own number is bought. |
 | `ANTHROPIC_API_KEY` | Bot, Linkbot's replies, and AI-written Docs. Without it, the rest still works. |
 | `CRON_SECRET` | Optional: `/api/cron/linkbot` on a schedule. Linkbot also moves on whenever the office uses Tenurage or a text arrives. |
 | `RESEND_API_KEY`, `EMAIL_FROM` | Optional: emailing the office when an applicant asks for them. |

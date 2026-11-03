@@ -5,6 +5,7 @@ import type { ViewingCampaign } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { mismatch, money } from "@/lib/matching";
 
+import { retryWaitingNumbers } from "./number";
 import { textApplicant } from "./sms";
 
 // Linkbot filling a property's open viewing slots. It texts the best-matched
@@ -185,6 +186,7 @@ export async function maybeTick(now = new Date()) {
       if (claimed.count === 0) return;
     } else await prisma.serviceKey.create({ data: { name: LAST_TICK, value: String(now.getTime()) } }).catch(() => undefined);
     await tick(now);
+    await retryWaitingNumbers(now);
   } catch (error) {
     console.error("linkbot tick failed", error);
   }

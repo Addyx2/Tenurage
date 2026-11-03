@@ -74,7 +74,7 @@ export default async function LinkbotSettingsPage({ searchParams }: { searchPara
             <div className="mt-2 space-y-2 text-sm">
               <Badge tone={bot.numberStatus === "failed" ? "amber" : "slate"}>{bot.numberStatus === "failed" ? "Couldn't get a number yet" : "Setting up"}</Badge>
               {bot.numberError ? <p className="text-slate-600">{bot.numberError}</p> : null}
-              {shared ? <p className="text-slate-500">Meanwhile it texts from the shared Linkbot number.</p> : null}
+              {shared ? <p className="text-slate-500">Meanwhile it texts from the shared Linkbot number.</p> : <p className="text-slate-500">It starts texting as soon as its number is ready.</p>}
               {isAdmin ? <form action={retryNumberAction}><button className={subtleButtonClass}>Try again</button></form> : null}
             </div>
           )}

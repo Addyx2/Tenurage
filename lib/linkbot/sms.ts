@@ -5,7 +5,7 @@ import { absoluteUrl } from "@/lib/url";
 
 // How an agency's Linkbot texts. Each Linkbot texts from a UK number of its
 // own, bought on Aultrum's Twilio account (lib/linkbot/number.ts). Until it
-// has one, it texts from the shared Linkbot number (TWILIO_FROM). An agency
+// has one, it texts from the shared Linkbot number (TWILIO_FROM) if one is set. An agency
 // without a Linkbot, or with it switched off, texts nobody.
 
 export interface Sender {
@@ -19,12 +19,18 @@ export interface SmsResult {
   reason?: string;
 }
 
-export function sharedSender(): Sender | null {
+/** Aultrum's Twilio account (TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN): all texting needs. */
+export function aultrumTwilio(): TwilioSecrets | null {
   const accountSid = process.env.TWILIO_ACCOUNT_SID?.trim();
   const authToken = process.env.TWILIO_AUTH_TOKEN?.trim();
+  return accountSid && authToken ? { accountSid, authToken } : null;
+}
+
+/** The optional shared number (TWILIO_FROM), used only until an agency's own number is bought. */
+export function sharedSender(): Sender | null {
+  const secrets = aultrumTwilio();
   const from = (process.env.TWILIO_FROM ?? process.env.TWILIO_PHONE_NUMBER)?.trim();
-  if (!accountSid || !authToken || !from) return null;
-  return { secrets: { accountSid, authToken }, from, shared: true };
+  return secrets && from ? { secrets, from, shared: true } : null;
 }
 
 export const SHARED_WEBHOOK_PATH = "/api/webhooks/twilio/shared";
@@ -43,9 +49,11 @@ async function ensureSharedWebhook(sender: Sender) {
 export async function smsSender(agencyId: string): Promise<Sender | null> {
   const bot = await prisma.linkbot.findUnique({ where: { agencyId }, select: { enabled: true, number: true, numberStatus: true } });
   if (!bot?.enabled) return null;
+  const secrets = aultrumTwilio();
+  if (!secrets) return null;
+  if (bot.numberStatus === "active" && bot.number) return { secrets, from: bot.number, shared: false };
   const account = sharedSender();
   if (!account) return null;
-  if (bot.numberStatus === "active" && bot.number) return { ...account, from: bot.number, shared: false };
   await ensureSharedWebhook(account).catch((error) => console.error("shared Twilio webhook not set", error));
   return account;
 }
