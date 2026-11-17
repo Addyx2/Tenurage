@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
-import { DM_Sans, Space_Grotesk } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Instrument_Serif, Inter_Tight } from "next/font/google";
 
 import "./globals.css";
 
-const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm", display: "swap", weight: ["400", "500", "600", "700"] });
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-grotesk", display: "swap", weight: ["400", "500", "600", "700"] });
+const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-inter-tight", display: "swap", weight: ["400", "500", "600", "700"] });
+const instrument = Instrument_Serif({ subsets: ["latin"], variable: "--font-instrument", display: "swap", weight: "400", style: ["normal", "italic"] });
+
+export const viewport: Viewport = { themeColor: "#ffffff", width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export const metadata: Metadata = {
   title: { default: "Tenurage: the AI-run estate and letting agency", template: "%s · Tenurage" },
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB" className={`${dmSans.variable} ${spaceGrotesk.variable}`}>
+    <html lang="en-GB" className={`${interTight.variable} ${instrument.variable}`}>
       <body className="min-h-screen">{children}</body>
     </html>
   );

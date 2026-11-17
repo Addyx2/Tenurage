@@ -1,6 +1,8 @@
 # Tenurage redesign: handoff
 
-Status: **waiting for the user to pick a visual direction.** Do not build the full app until they choose.
+Status: **the user chose A · Open Sky (17 Nov 2026). The rebuild is done on this branch and open as a PR into main.** Merge only when the user says "deploy" and CI is green.
+
+What was built: Open Sky tokens in `app/globals.css` (neutral greys, ink buttons, `ai-*` brick orange for Linkbot/Bot only, `.sky` backdrop, `md` = 760px); Inter Tight + Instrument Serif; top nav + Ask Bot bar (`/` focuses it) on desktop, four-tab bar under 760px; Today (`/today`, `/launchpad` redirects); properties as photo cards, photo-led detail with Linkbot conversations and a photos/video form; applicants pipeline (`lib/pipeline.ts`) and detail with stage, call/text and inline texting; viewings as cards; Bot and sign-in restyled. Data: `Property.photos`, `Property.videoUrl`, `Applicant.offerStage` (migration `20261117120000_property_media_and_offer_stage`). Photos and video are https links, not uploads; Reapit sync doesn't bring images in yet.
 
 ## Brief (summary)
 Redesign the Tenurage interface (Next.js 15 App Router, Prisma/Postgres, Tailwind). Tenurage is a standalone product for UK estate and letting agencies: properties, applicants, viewings, Linkbot (texts matched applicants, books viewings, reminders, feedback, takes office jobs by text) and Bot (office AI chat that proposes changes for approval). It is not part of the Aultrum care family (Pleasant, Elements); do not reuse that design system.

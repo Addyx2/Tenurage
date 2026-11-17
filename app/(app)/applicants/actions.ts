@@ -47,3 +47,15 @@ export async function setApplicantStatusAction(form: FormData): Promise<void> {
   await prisma.applicant.updateMany({ where: { id, agencyId: user.agencyId }, data: { status } });
   revalidatePath(`/applicants/${id}`);
 }
+
+/** The office moves someone on to offer, or let/sold, or back to where their viewings put them. */
+export async function setApplicantStageAction(form: FormData): Promise<void> {
+  const user = await requireUser();
+  const id = String(form.get("applicantId") ?? "");
+  const stage = String(form.get("stage") ?? "");
+  if (!["OFFER", "AGREED", ""].includes(stage)) return;
+  const r = await prisma.applicant.updateMany({ where: { id, agencyId: user.agencyId }, data: { offerStage: stage || null } });
+  if (r.count) await recordAudit(user, { action: "applicant.stage", summary: stage ? `Moved an applicant to ${stage === "OFFER" ? "offer" : "let/sold"}` : "Moved an applicant back to their viewings stage", targetType: "applicant", targetId: id });
+  revalidatePath(`/applicants/${id}`);
+  revalidatePath("/applicants");
+}

@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE } from "./lib/constants";
 
 // The office app needs a session; texts, webhooks and the health check don't.
-const PROTECTED = ["/launchpad", "/properties", "/applicants", "/viewings", "/linkbot", "/bot", "/docs", "/integrations", "/settings"];
+const PROTECTED = ["/today", "/launchpad", "/properties", "/applicants", "/viewings", "/linkbot", "/bot", "/docs", "/integrations", "/settings"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -17,5 +17,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/launchpad/:path*", "/properties/:path*", "/applicants/:path*", "/viewings/:path*", "/linkbot/:path*", "/bot/:path*", "/docs/:path*", "/integrations/:path*", "/settings/:path*"],
+  matcher: ["/today/:path*", "/launchpad/:path*", "/properties/:path*", "/applicants/:path*", "/viewings/:path*", "/linkbot/:path*", "/bot/:path*", "/docs/:path*", "/integrations/:path*", "/settings/:path*"],
 };

@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 type Tone = "neutral" | "brand" | "green" | "amber" | "red" | "blue" | "slate";
 
 const TONES: Record<Tone, string> = {
-  neutral: "bg-slate-50 text-slate-600 ring-slate-500/10",
-  slate: "bg-slate-100 text-slate-600 ring-slate-600/10",
-  brand: "bg-brand-50 text-brand-700 ring-brand-600/15",
+  neutral: "bg-white text-slate-600 ring-slate-900/10",
+  slate: "bg-slate-100 text-slate-600 ring-slate-900/5",
+  brand: "bg-slate-900 text-white ring-slate-900",
   green: "bg-emerald-50 text-emerald-700 ring-emerald-600/15",
   amber: "bg-amber-50 text-amber-800 ring-amber-600/20",
   red: "bg-red-50 text-red-700 ring-red-600/15",
@@ -50,9 +50,9 @@ export function Card({
     <div
       id={id}
       className={cn(
-        "rounded-xl border border-slate-200 bg-white shadow-card",
+        "rounded-card border border-line bg-white",
         interactive &&
-          "transition duration-150 hover:border-slate-300 hover:shadow-card-hover",
+          "transition duration-200 hover:border-slate-300 hover:shadow-card-hover",
         className,
       )}
     >
@@ -83,7 +83,7 @@ export function IconTile({
   return (
     <span
       className={cn(
-        "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ring-1 ring-inset ring-black/[0.04]",
+        "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ring-black/[0.04]",
         TILE_TONES[tone],
         className,
       )}
@@ -105,7 +105,7 @@ export function PageHeader({
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h1 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-[1.65rem]">
+        <h1 className="headline text-3xl sm:text-4xl">
           {title}
         </h1>
         {description ? <p className="mt-1.5 text-sm text-slate-500">{description}</p> : null}
@@ -133,7 +133,7 @@ export function StatCard({
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[13px] font-medium text-slate-500">{label}</p>
-          <p className="tabular mt-1.5 font-display text-3xl font-bold tracking-tight text-slate-900">
+          <p className="tabular mt-1.5 font-display text-3xl font-medium tracking-tight text-slate-900">
             {value}
           </p>
           {hint ? <p className="mt-1.5 text-xs text-slate-500">{hint}</p> : null}
@@ -156,9 +156,9 @@ export function EmptyState({
   icon?: React.ComponentType<{ className?: string }>;
 }) {
   return (
-    <div className="rounded-xl border border-dashed border-slate-300 bg-white/60 p-10 text-center">
+    <div className="rounded-card border border-dashed border-slate-300 bg-white/60 p-10 text-center">
       {Icon ? (
-        <span className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-brand-600 ring-1 ring-inset ring-brand-600/10">
+        <span className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-700">
           <Icon className="h-5 w-5" />
         </span>
       ) : null}
@@ -170,15 +170,19 @@ export function EmptyState({
 }
 
 export const inputClass =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10";
+  "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-slate-900 focus:ring-4 focus:ring-slate-900/5";
 
 export const labelClass = "block text-sm font-medium text-slate-700";
 
 export const buttonClass =
-  "inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-btn transition duration-150 hover:bg-brand-700 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60";
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-slate-900 bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition duration-150 hover:bg-black active:scale-[0.99] disabled:pointer-events-none disabled:opacity-50";
 
 export const subtleButtonClass =
-  "inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 transition duration-150 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60";
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900 transition duration-150 hover:border-slate-300 hover:bg-slate-50 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-50";
+
+/** For what the AI does: Linkbot and Bot. */
+export const aiButtonClass =
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-slate-900 bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition duration-150 hover:bg-black active:scale-[0.99] disabled:pointer-events-none disabled:opacity-50 [&>svg]:text-ai-500";
 
 export function Skeleton({ className }: { className?: string }) {
   return <div className={cn("animate-pulse rounded-md bg-slate-200/80", className)} />;

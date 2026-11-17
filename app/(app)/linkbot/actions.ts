@@ -11,6 +11,7 @@ import { toE164 } from "@/lib/integrations/phone";
 import { startCampaign, stopCampaign } from "@/lib/linkbot/campaign";
 import { provisionNumber } from "@/lib/linkbot/number";
 import { textApplicant } from "@/lib/linkbot/sms";
+import { safeNextPath } from "@/lib/utils";
 
 export async function saveLinkbotAction(form: FormData): Promise<void> {
   const user = await requireAdmin();
@@ -78,5 +79,7 @@ export async function textApplicantAction(form: FormData): Promise<void> {
     if (!r.sent) error = r.reason ?? "Not sent.";
     else await recordAudit(user, { action: "linkbot.text", summary: "Texted an applicant from the office", targetType: "applicant", targetId: applicantId });
   }
-  redirect(`/linkbot/texts/${applicantId}${error ? `?error=${encodeURIComponent(error)}` : "?sent=1"}`);
+  // Sent from the applicant's page: go back there.
+  const back = safeNextPath(String(form.get("back") ?? "")) ?? `/linkbot/texts/${applicantId}`;
+  redirect(`${back}${error ? `?error=${encodeURIComponent(error)}` : "?sent=1"}`);
 }

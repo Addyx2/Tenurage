@@ -83,6 +83,10 @@ model Property {
   status    String   @default("AVAILABLE")
   summary   String   @default("")
   features  String[] @default([])
+  /// Photo URLs (https), first is the cover.
+  photos    String[] @default([])
+  /// A video tour (https link to an .mp4/.webm file), played muted on cards.
+  videoUrl  String?
   /// Where the property came from in Reapit, if it was synced.
   reapitId  String?
   createdAt DateTime @default(now())
@@ -115,6 +119,9 @@ model Applicant {
   /// ACTIVE | PAUSED | ARCHIVED
   status      String    @default("ACTIVE")
   notes       String    @default("")
+  /// Set by the office once things go past viewings: OFFER | AGREED.
+  /// Before that, the pipeline stage comes from their viewings.
+  offerStage  String?
   /// They texted STOP: no texts until START.
   smsOptOutAt DateTime?
   reapitId    String?

@@ -36,7 +36,7 @@ export default async function DocPage({ params, searchParams }: { params: Promis
           <textarea name="body" defaultValue={doc.body} rows={22} aria-label="Body" className="w-full resize-y rounded-lg border border-slate-200 p-3 font-mono text-sm leading-relaxed outline-none focus:border-brand-500" />
           <div className="flex flex-wrap justify-end gap-2">
             <button className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:border-brand-300">Save draft</button>
-            <button formAction={saveFinalDocAction} className="rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-700">Save as final</button>
+            <button formAction={saveFinalDocAction} className="rounded-full bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700">Save as final</button>
           </div>
         </form>
       </Card>

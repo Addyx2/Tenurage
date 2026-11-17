@@ -62,7 +62,7 @@ export default async function DocsPage({ searchParams }: { searchParams: Promise
                 <option value="" disabled>Choose a property</option>
                 {properties.map((p) => <option key={p.id} value={p.id}>{p.address}</option>)}
               </select>
-              <button className="w-full rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-700">Draft particulars</button>
+              <button className="w-full rounded-full bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700">Draft particulars</button>
             </form>
           </Card>
           <Card className="p-5">
