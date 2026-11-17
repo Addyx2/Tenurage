@@ -1,0 +1,168 @@
+const fs = require('fs');
+const logo = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M12 4v16"/><path d="M8 20h8"/></svg>`;
+const house = `<svg class="facade" viewBox="0 0 200 140" preserveAspectRatio="xMidYMax slice"><g fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 140V58l40-30 40 30v82M100 140V58l40-30 40 30v82"/><path d="M8 66 60 26l52 40M88 66l52-40 52 40" opacity=".5"/><rect x="45" y="104" width="22" height="36" rx="11"/><rect x="125" y="104" width="22" height="36" rx="11"/><path d="M28 92h32v30H28zM108 92h0"/><rect x="28" y="64" width="16" height="20"/><rect x="72" y="64" width="16" height="20"/><rect x="108" y="64" width="16" height="20"/><rect x="152" y="64" width="16" height="20"/><rect x="152" y="96" width="20" height="24"/></g></svg>`;
+const flat = `<svg class="facade" viewBox="0 0 200 140" preserveAspectRatio="xMidYMax slice"><g fill="none" stroke="currentColor" stroke-width="1.6"><path d="M50 140V20h100v120"/><path d="M42 20h116" opacity=".5"/>${[34,62,90].map(y=>[64,92,120].map(x=>`<rect x="${x}" y="${y}" width="16" height="20"/>`).join('')).join('')}<rect x="88" y="116" width="24" height="24" rx="12"/></g></svg>`;
+const ph = (kind, cls='') => `<div class="ph ${cls}">${kind==='house'?house:flat}<span class="ph-note">No photos yet</span></div>`;
+const ico = {
+  call:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+  text:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  map:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 19-9-9 19-2-8z"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8z"/></svg>',
+  today:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  home:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11 12 4l9 7v9H3z"/></svg>',
+  people:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c1-4 4-6 7-6s6 2 7 6M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2 .7 3.4 2.6 4 6"/></svg>',
+  bot:'<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8z"/></svg>',
+};
+const props = [
+  ['14 Cotham Grove','BS6 6AL','2 bed flat','£1,450 pcm','To let','0 booked · 3 open slots','flat',true],
+  ['3 Ashley Hill','BS7 9LE','3 bed house','£1,850 pcm','To let','1 booked · today 18:00','house',false],
+  ['22 Gloucester Road','BS7 8AE','1 bed flat','£235,000','For sale','No viewings yet','flat',false],
+  ['9 Whiteladies Road','BS8 1PB','1 bed flat','£1,100 pcm','Let agreed','Closed','flat',false],
+];
+const body = (dir) => `
+<header class="top"><div class="brand">${logo}<span>Tenurage</span></div>
+<nav class="nav"><a class="on">Today</a><a>Properties</a><a>Applicants</a><a>Viewings</a><a>Bot</a><a>Linkbot</a></nav>
+<div class="ask ask-top">${ico.spark}<span>Ask Bot anything…</span><kbd>/</kbd></div><div class="me">AM</div></header>
+<main>
+<section class="hero">
+ <div class="intro">
+  <p class="eyebrow">Tuesday 17 November · Demo Lettings, Bristol</p>
+  <h1>Good afternoon, Alex. <span>One viewing tonight, three slots to fill tomorrow.</span></h1>
+  <div class="ask ask-inline">${ico.spark}<span>Ask Bot: “Who’s viewing Ashley Hill tonight?”</span></div>
+ </div>
+ <div class="stage"><div class="sky"><i></i><i></i><i></i></div>
+  <article class="viewing card">
+   ${ph('house','ph-lg')}
+   <div class="v-body">
+    <div class="v-time"><b>18:00</b><span>Today · 20 min</span></div>
+    <h3>3 Ashley Hill</h3><p class="muted">BS7 9LE · 3 bed house · £1,850 pcm</p>
+    <div class="person"><div class="av">TH</div><div><b>Tom Hughes</b><span class="muted">Applicant · booked by office</span></div></div>
+    <div class="actions"><a class="btn">${ico.call}Call</a><a class="btn">${ico.text}Text</a><a class="btn">${ico.map}Directions</a></div>
+   </div>
+  </article>
+  <article class="float card">
+   <p class="tag ai">${ico.spark} Linkbot suggests</p>
+   <p><b>14 Cotham Grove</b> has 3 open slots tomorrow. Jordan Reid and Priya Shah match.</p>
+   <div class="actions"><a class="btn solid">Text them</a><a class="btn">Review</a></div>
+  </article>
+ </div>
+</section>
+<section class="cols">
+ <div class="panel">
+  <h2>Recent activity <span>Linkbot, Bot and the office</span></h2>
+  <ul class="feed">
+   <li><span class="src ai">Linkbot</span><div><b>Found 2 matched applicants for 14 Cotham Grove</b><p class="muted">Ready to text. Ellie Watts also matches but has no mobile number.</p></div><time>Now</time></li>
+   <li><span class="src">Feedback</span><div><b>Priya Shah · 3 Ashley Hill · 5/5</b><p class="quote">“Loved the garden, would like to apply.”</p></div><time>Sun</time></li>
+   <li><span class="src">Office</span><div><b>Booked Tom Hughes for 3 Ashley Hill</b><p class="muted">Today at 18:00</p></div><time>Today</time></li>
+  </ul>
+ </div>
+ <div class="panel">
+  <h2>Needs a person <span>3</span></h2>
+  <ul class="needs">
+   <li><div class="av">PS</div><div><b>Priya Shah wants to apply</b><p class="muted">3 Ashley Hill · after Sunday’s viewing</p></div><div class="mini"><a>${ico.call}</a><a>${ico.text}</a></div></li>
+   <li><div class="av">EW</div><div><b>Ellie Watts has no mobile number</b><p class="muted">No mobile, so Linkbot can’t text matches</p></div><a class="btn sm">Add number</a></li>
+   <li><div class="av sq">${ico.home}</div><div><b>22 Gloucester Road has no description or photos</b><p class="muted">Bot can draft one from the details</p></div><a class="btn sm">Draft it</a></li>
+  </ul>
+ </div>
+</section>
+<section class="props">
+ <h2>On the market <span>4 properties</span></h2>
+ <div class="grid">${props.map(([a,pc,k,pr,st,v,kind,fill])=>`
+  <article class="pcard">${ph(kind)}<span class="status ${st==='Let agreed'?'done':''}">${st}</span>
+   <div class="p-body"><h3>${a}</h3><p class="muted">${pc} · ${k}</p><p class="price">${pr}</p><p class="muted small">${v}</p>
+   ${fill?`<a class="btn solid sm full">${ico.spark} Fill with Linkbot</a>`:''}</div></article>`).join('')}
+ </div>
+</section>
+</main>
+<nav class="tabs"><a class="on">${ico.today}Today</a><a>${ico.home}Properties</a><a>${ico.people}Applicants</a><a>${ico.bot}Bot</a></nav>`;
+
+const base = `
+*{box-sizing:border-box;margin:0;padding:0}a{cursor:pointer;color:inherit;text-decoration:none}ul{list-style:none}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.top{display:flex;align-items:center;gap:28px;padding:18px 40px;position:sticky;top:0;z-index:5;background:var(--bg-t);backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:19px;letter-spacing:-.02em}
+.nav{display:flex;gap:4px}.nav a{padding:8px 14px;border-radius:99px;font-size:14px;color:var(--muted)}.nav a.on{color:var(--fg);background:var(--chip)}
+.ask{display:flex;align-items:center;gap:10px;border-radius:99px;font-size:14px;color:var(--muted)}
+.ask svg{color:var(--ai)}.ask-top{margin-left:auto;border:1px solid var(--line);padding:9px 14px;width:300px}.ask-top kbd{margin-left:auto;font:12px var(--sans);border:1px solid var(--line);border-radius:5px;padding:0 6px}
+.ask-inline{display:none}
+.me{width:34px;height:34px;border-radius:50%;background:var(--fg);color:var(--bg);display:grid;place-items:center;font-size:12px;font-weight:600}
+main{max-width:1360px;margin:0 auto;padding:0 40px 80px}
+.eyebrow{font-size:13px;color:var(--muted);margin-bottom:18px}
+h1{font-family:var(--display);font-weight:var(--h1w);font-size:var(--h1s);line-height:1.04;letter-spacing:var(--h1t)}h1 span{color:var(--h1sub)}
+h2{font-size:18px;font-weight:600;letter-spacing:-.01em;margin-bottom:16px;display:flex;gap:10px;align-items:baseline}h2 span{font-size:13px;color:var(--muted);font-weight:400}
+h3{font-size:18px;font-weight:600;letter-spacing:-.015em}
+.muted{color:var(--muted);font-size:14px}.small{font-size:13px}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line);border-radius:99px;padding:9px 16px;font-size:14px;font-weight:500;background:var(--card)}
+.btn.solid{background:var(--fg);color:var(--bg);border-color:var(--fg)}.btn.sm{padding:6px 12px;font-size:13px;white-space:nowrap}.btn.full{width:100%;margin-top:14px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.av{width:38px;height:38px;flex:none;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-size:13px;font-weight:600}.av.sq{border-radius:12px}
+.person{display:flex;gap:12px;align-items:center;margin-top:16px}.person span{display:block}
+.ph{position:relative;background:var(--ph-bg);color:var(--ph-fg);overflow:hidden;aspect-ratio:16/10}
+.ph .facade{position:absolute;inset:14% 6% 0;width:88%;height:86%}.ph-note{position:absolute;left:12px;bottom:10px;font-size:11px;padding:3px 8px;border-radius:99px;background:var(--ph-chip);color:var(--muted)}
+.hero{display:grid;grid-template-columns:1fr 1.4fr;gap:48px;align-items:center;padding:56px 0 64px}
+.stage{position:relative;border-radius:var(--rl);min-height:560px;overflow:hidden;padding:40px}
+.sky{position:absolute;inset:0;background:var(--sky);background-size:200% 200%;animation:drift 18s ease-in-out infinite alternate}
+.sky i{position:absolute;border-radius:50%;filter:blur(40px);background:var(--cloud);animation:float 22s ease-in-out infinite alternate}
+.sky i:nth-child(1){width:380px;height:140px;left:-40px;top:70px}.sky i:nth-child(2){width:300px;height:120px;right:-20px;top:240px;animation-duration:28s}.sky i:nth-child(3){width:460px;height:160px;left:120px;bottom:-40px;animation-duration:34s}
+@keyframes drift{to{background-position:100% 100%}}@keyframes float{to{transform:translateX(80px)}}
+.viewing{position:relative;width:340px;overflow:hidden}.viewing .ph-lg{aspect-ratio:16/9}.v-body{padding:20px}
+.v-time{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}.v-time b{font-size:30px;letter-spacing:-.03em;font-family:var(--display);font-weight:var(--h1w)}.v-time span{font-size:13px;color:var(--muted)}
+.float{position:absolute;right:32px;bottom:36px;width:290px;padding:18px;font-size:14px;line-height:1.45}
+.tag{display:inline-flex;gap:6px;align-items:center;font-size:12px;font-weight:600;margin-bottom:8px}.tag.ai,.src.ai{color:var(--ai)}
+.cols{display:grid;grid-template-columns:1.2fr 1fr;gap:24px}
+.panel{background:var(--panel);border-radius:var(--r);padding:28px;border:var(--panel-b)}
+.feed li,.needs li{display:flex;gap:14px;align-items:flex-start;padding:16px 0;border-top:1px solid var(--line)}.feed li:first-child,.needs li:first-child{border-top:0;padding-top:4px}
+.feed li>div,.needs li>div:nth-child(2){flex:1;min-width:0}.feed b,.needs b{font-size:15px;font-weight:500}.feed time{font-size:12px;color:var(--muted)}
+.src{flex:none;width:72px;font-size:12px;font-weight:600;color:var(--muted);padding-top:2px}
+.quote{font-family:var(--quote);font-size:var(--quote-s);margin-top:4px}
+.mini{display:flex;gap:6px}.mini a{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center}
+.props{margin-top:56px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.pcard{position:relative;background:var(--card);border-radius:var(--r);overflow:hidden;border:var(--panel-b);box-shadow:var(--shadow-s)}
+.status{position:absolute;right:12px;top:10px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--card);box-shadow:0 1px 4px rgba(0,0,0,.08)}.status.done{background:var(--fg);color:var(--bg)}
+.p-body{padding:16px 18px 18px}.price{font-size:20px;font-weight:600;letter-spacing:-.02em;margin:8px 0 2px}
+.tabs{display:none}
+@media (max-width:760px){
+ .top{padding:14px 16px;gap:12px}.nav,.ask-top{display:none}.me{margin-left:auto}
+ main{padding:0 16px 110px}
+ .hero{display:block;padding:12px 0 20px}.eyebrow{margin-bottom:10px}.ask-inline{margin-top:14px!important}h1{font-size:var(--h1m)}
+ .ask-inline{display:flex;border:1px solid var(--line);padding:13px 16px;margin:20px 0 4px;background:var(--card)}
+ .stage{min-height:0;padding:16px;margin:20px -16px 0;border-radius:0}.viewing{width:100%}.float{position:relative;right:auto;bottom:auto;width:auto;margin-top:12px}
+ .actions .btn{flex:1;padding:12px 8px}
+ .cols{display:block}.panel{padding:20px;margin-bottom:16px}
+ .src{width:62px}
+ .props{margin-top:28px}.grid{grid-template-columns:1fr 1fr;gap:12px}.p-body{padding:12px}.p-body h3{font-size:15px}.price{font-size:16px}.pcard .muted{font-size:12px}
+ .tabs{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:9;background:var(--bg-t);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:8px 8px 26px}
+ .tabs a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted)}.tabs a.on{color:var(--fg)}.tabs a:nth-child(4) svg{color:var(--ai)}
+}`;
+
+const dirs = {
+  sky: { name:'A · Open Sky', fonts:'Inter+Tight:wght@400;500;600&family=Instrument+Serif:ital@0;1', css:`:root{
+   --sans:'Inter Tight',sans-serif;--display:'Inter Tight',sans-serif;--quote:'Instrument Serif',serif;--quote-s:19px;
+   --bg:#fff;--bg-t:rgba(255,255,255,.82);--fg:#0d0d0d;--muted:#6f6f6f;--line:#e6e6e6;--chip:#f2f2f2;--card:#fff;--panel:#fff;--panel-b:1px solid #ececec;
+   --ai:#e5582a;--r:18px;--rl:28px;--shadow:0 24px 60px -20px rgba(20,40,80,.35);--shadow-s:none;
+   --h1w:500;--h1s:62px;--h1m:30px;--h1t:-.035em;--h1sub:#a3a3a3;
+   --sky:linear-gradient(160deg,#9cc7ec 0%,#cfe3f4 40%,#f6dcc4 75%,#f2b48f 100%);--cloud:rgba(255,255,255,.75);
+   --ph-bg:linear-gradient(180deg,#eef3f8,#e3eaf1);--ph-fg:#9fb0c2;--ph-chip:rgba(255,255,255,.8)}`},
+  studio: { name:'B · Quiet Studio', fonts:'Geist:wght@400;500;600', css:`:root{
+   --sans:'Geist',sans-serif;--display:'Geist',sans-serif;--quote:'Geist',sans-serif;--quote-s:15px;
+   --bg:#fff;--bg-t:rgba(255,255,255,.85);--fg:#0b0b0b;--muted:#808080;--line:#ebebeb;--chip:#f4f4f4;--card:#fff;--panel:#f6f6f5;--panel-b:0;
+   --ai:#2f4bff;--r:16px;--rl:20px;--shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px -12px rgba(0,0,0,.12);--shadow-s:none;
+   --h1w:450;--h1s:56px;--h1m:29px;--h1t:-.04em;--h1sub:#9a9a9a;
+   --sky:linear-gradient(135deg,#f4f4f3,#ececea 50%,#f7f7f6);--cloud:rgba(47,75,255,.10);
+   --ph-bg:#efefed;--ph-fg:#bdbdb8;--ph-chip:#fff}
+   .stage{background:#f4f4f3}.pcard{background:#f6f6f5}.pcard .ph{margin:8px;border-radius:12px;aspect-ratio:4/3}.status{right:20px;top:18px}
+   .quote{color:#3a3a3a}.feed li{border-top-color:#e6e6e4}`},
+  night: { name:'C · After Hours', fonts:'Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1', css:`:root{
+   --sans:'Inter',sans-serif;--display:'Instrument Serif',serif;--quote:'Instrument Serif',serif;--quote-s:20px;
+   --bg:#0c0c0b;--bg-t:rgba(12,12,11,.8);--fg:#f3f1ec;--muted:#8e8b84;--line:#26251f;--chip:#1c1b18;--card:#161512;--panel:#141310;--panel-b:1px solid #23221d;
+   --ai:#d7f25a;--r:16px;--rl:24px;--shadow:0 30px 80px -20px rgba(0,0,0,.8);--shadow-s:none;
+   --h1w:400;--h1s:76px;--h1m:36px;--h1t:-.02em;--h1sub:#8e8b84;
+   --sky:radial-gradient(120% 90% at 70% 110%,#e0794a 0%,#6b3a52 35%,#1d1a2e 70%,#0c0c0b 100%);--cloud:rgba(255,170,120,.18);
+   --ph-bg:linear-gradient(180deg,#2a2530,#1a1720);--ph-fg:#6e6578;--ph-chip:rgba(0,0,0,.5)}
+   .btn.solid{background:var(--ai);color:#0c0c0b;border-color:var(--ai)}.me{background:var(--ai);color:#0c0c0b}
+   .stage{border:1px solid #23221d}.status{background:#0c0c0b}.status.done{background:var(--fg);color:#0c0c0b}`},
+};
+for (const [k,d] of Object.entries(dirs)) fs.writeFileSync(`${k}.html`, `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tenurage · ${d.name}</title>
+<link href="https://fonts.googleapis.com/css2?family=${d.fonts}&display=swap" rel="stylesheet"><style>${base}${d.css}</style></head><body>${body(k)}</body></html>`);
+console.log('ok');
