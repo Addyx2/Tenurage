@@ -31,8 +31,8 @@ export default async function LinkbotPage() {
   return (
     <div className="space-y-6">
       {!bot ? (
-        <Card className="flex flex-wrap items-center justify-between gap-3 border-brand-200 bg-brand-50/60 p-4">
-          <p className="text-sm text-brand-900"><span className="font-semibold">Create your agency&apos;s Linkbot</span> to text applicants from a number of its own. It takes a minute.</p>
+        <Card className="flex flex-wrap items-center justify-between gap-3 border-ai-200 bg-ai-50/60 p-4">
+          <p className="text-sm text-ai-700"><span className="font-semibold">Create your agency&apos;s Linkbot</span> to text applicants from a number of its own. It takes a minute.</p>
           <Link href="/linkbot/settings" className={buttonClass}>Create it</Link>
         </Card>
       ) : !sender ? (
@@ -59,7 +59,7 @@ export default async function LinkbotPage() {
                 </div>
                 <ul className="mt-3 flex flex-wrap gap-2 text-xs">
                   {c.property.viewings.map((v) => (
-                    <li key={v.id} className={v.status === "BOOKED" ? "rounded-full bg-brand-50 px-2.5 py-1 text-brand-800" : "rounded-full bg-slate-100 px-2.5 py-1 text-slate-600"}>
+                    <li key={v.id} className={v.status === "BOOKED" ? "rounded-full bg-ai-50 px-2.5 py-1 text-ai-700" : "rounded-full bg-slate-100 px-2.5 py-1 text-slate-600"}>
                       {slotLabel(v.startAt)} · {v.applicant ? `${v.applicant.firstName} ${v.applicant.lastName}` : "free"}
                     </li>
                   ))}

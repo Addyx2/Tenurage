@@ -29,5 +29,5 @@ export async function signupAction(_prev: SignupState, form: FormData): Promise<
   });
   await recordAudit(user, { action: "agency.create", summary: `Created ${d.agencyName}` });
   await setSessionCookie(user);
-  redirect("/launchpad");
+  redirect("/today");
 }

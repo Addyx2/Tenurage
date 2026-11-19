@@ -27,7 +27,7 @@ export default async function ConversationPage({ params, searchParams }: { param
         {texts.length === 0 ? <p className="text-sm text-slate-500">No texts yet.</p> : null}
         {[...texts].reverse().map((t) => (
           <div key={t.id} className={cn("flex", t.direction === "IN" ? "justify-start" : "justify-end")}>
-            <div className={cn("max-w-[80%] rounded-2xl px-3 py-2 text-sm", t.direction === "IN" ? "bg-slate-100 text-slate-900" : "bg-brand-700 text-white", t.status === "FAILED" && "bg-red-100 text-red-800")}>
+            <div className={cn("max-w-[80%] rounded-2xl px-3 py-2 text-sm", t.direction === "IN" ? "bg-slate-100 text-slate-900" : "bg-slate-900 text-white", t.status === "FAILED" && "bg-red-100 text-red-800")}>
               <p className="whitespace-pre-wrap">{t.body}</p>
               <p className={cn("mt-1 text-[10px]", t.direction === "IN" ? "text-slate-400" : "text-white/70")}>{fmt.format(t.createdAt)}{t.status === "FAILED" ? " · not sent" : ""}</p>
             </div>

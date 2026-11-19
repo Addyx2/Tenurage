@@ -1,20 +1,19 @@
-/** Tenurage's mark: a roofline over a key-bit, in the brand teal. */
-export function TenurageMark({ className = "h-8 w-8" }: { className?: string }) {
+/** Tenurage's mark: a roof over a T. A placeholder until there's a brand. */
+export function TenurageMark({ className = "h-[22px] w-[22px]" }: { className?: string }) {
   return (
-    <span className={`flex items-center justify-center rounded-lg bg-brand-700 text-white ${className}`} aria-hidden="true">
-      <svg viewBox="0 0 24 24" className="h-[60%] w-[60%]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 11.5 12 4l9 7.5" />
-        <path d="M12 9.5v10M12 14h3.5M12 17.5h2.5" />
-      </svg>
-    </span>
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 11.5 12 4l9 7.5" />
+      <path d="M12 4v16" />
+      <path d="M8 20h8" />
+    </svg>
   );
 }
 
 export function TenurageWordmark() {
   return (
-    <span className="flex items-center gap-2.5">
+    <span className="flex items-center gap-2 text-slate-900">
       <TenurageMark />
-      <span className="font-display text-lg font-bold tracking-tight text-slate-900">Tenurage</span>
+      <span className="text-[19px] font-semibold tracking-[-0.02em]">Tenurage</span>
     </span>
   );
 }

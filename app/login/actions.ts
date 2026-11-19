@@ -46,7 +46,7 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
   await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date(), failedLoginCount: 0, lockedUntil: null } });
   await recordAudit(user, { action: "auth.login", summary: "Signed in" });
   await setSessionCookie(user);
-  redirect(safeNextPath(String(formData.get("next") ?? "")) ?? "/launchpad");
+  redirect(safeNextPath(String(formData.get("next") ?? "")) ?? "/today");
 }
 
 export async function logoutAction(): Promise<void> {

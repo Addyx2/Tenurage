@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { recordAudit } from "@/lib/audit";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { parsePhotoUrls, parseVideoUrl } from "@/lib/media";
 import { propertySchema } from "@/lib/validation";
 
 export interface FormState {
@@ -68,4 +69,20 @@ export async function removeSlotAction(form: FormData): Promise<void> {
   const v = await prisma.viewing.findFirst({ where: { id, agencyId: user.agencyId, status: "OPEN" } });
   if (v) await prisma.viewing.delete({ where: { id } });
   revalidatePath(`/properties/${v?.propertyId ?? ""}`);
+}
+
+/** Photos (https links, first is the cover) and a video tour link. */
+export async function setPropertyMediaAction(form: FormData): Promise<void> {
+  const user = await requireUser();
+  const id = String(form.get("propertyId") ?? "");
+  const property = await prisma.property.findFirst({ where: { id, agencyId: user.agencyId } });
+  if (!property) return;
+  const photos = parsePhotoUrls(String(form.get("photos") ?? ""));
+  const video = parseVideoUrl(String(form.get("videoUrl") ?? ""));
+  const error = "error" in photos ? photos.error : "error" in video ? video.error : null;
+  if (error || "error" in photos || "error" in video) redirect(`/properties/${id}?mediaError=${encodeURIComponent(error ?? "Check the links")}#media`);
+  await prisma.property.update({ where: { id }, data: { photos: photos.photos, videoUrl: video.videoUrl } });
+  await recordAudit(user, { action: "property.media", summary: `Updated photos and video for ${property.address}`, targetType: "property", targetId: id });
+  revalidatePath(`/properties/${id}`);
+  redirect(`/properties/${id}?media=1`);
 }

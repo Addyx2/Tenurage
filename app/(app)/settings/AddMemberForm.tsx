@@ -14,7 +14,7 @@ export function AddMemberForm() {
       <input name="lastName" placeholder="Last name" required aria-label="Last name" className={field} />
       <input name="email" type="email" placeholder="Email" required aria-label="Email" className={field} />
       <select name="role" defaultValue="NEGOTIATOR" aria-label="Role" className={field}><option value="NEGOTIATOR">Negotiator</option><option value="ADMIN">Admin</option></select>
-      <button disabled={pending} className="rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60">{pending ? "Adding…" : "Add"}</button>
+      <button disabled={pending} className="rounded-full bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-60">{pending ? "Adding…" : "Add"}</button>
       {state.error ? <p role="alert" className="text-sm text-red-700 sm:col-span-5">{state.error}</p> : null}
       {state.added ? (
         <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800 sm:col-span-5">

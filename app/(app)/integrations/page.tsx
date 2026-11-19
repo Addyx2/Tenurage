@@ -46,7 +46,7 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
               <p className="text-xs text-slate-500">Tenurage reads from Reapit; it doesn&apos;t write to it yet. Bookings Linkbot makes stay in Tenurage, and an applicant who texted STOP stays opted out after a sync.</p>
               {admin ? (
                 <div className="flex flex-wrap gap-2">
-                  <form action={syncReapitAction}><button className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-700"><RefreshCw className="h-4 w-4" /> Sync now</button></form>
+                  <form action={syncReapitAction}><button className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700"><RefreshCw className="h-4 w-4" /> Sync now</button></form>
                   <form action={disconnectAction}><input type="hidden" name="provider" value="reapit" /><button className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:border-red-300 hover:text-red-700">Disconnect</button></form>
                 </div>
               ) : null}
@@ -57,7 +57,7 @@ export default async function IntegrationsPage({ searchParams }: { searchParams:
               <label className="text-xs font-medium text-slate-600">Client secret<input name="clientSecret" type="password" required autoComplete="off" className={`${field} mt-1`} /></label>
               <label className="text-xs font-medium text-slate-600">Customer id<input name="customerId" required placeholder="SBOX for the sandbox" className={`${field} mt-1`} /></label>
               <p className="text-xs text-slate-500 sm:col-span-2">Register an app with client credentials in the Reapit Developer Portal and install it for your customer. The secret is encrypted before it&apos;s stored.</p>
-              <div className="sm:text-right"><button className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">Connect and sync</button></div>
+              <div className="sm:text-right"><button className="rounded-full bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">Connect and sync</button></div>
             </form>
           ) : <p className="mt-4 text-sm text-slate-500">An admin can connect Reapit.</p>}
         </Card>

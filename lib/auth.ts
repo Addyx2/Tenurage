@@ -71,7 +71,7 @@ export async function requireUser() {
 /** Settings, team and integrations: admins only. */
 export async function requireAdmin() {
   const user = await requireUser();
-  if (user.role !== "ADMIN") redirect("/launchpad");
+  if (user.role !== "ADMIN") redirect("/today");
   return user;
 }
 
