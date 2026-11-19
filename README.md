@@ -26,7 +26,7 @@ Checks: `npm run typecheck`, `npm run lint`, `npm test`, `npm run test:contract`
 | --- | --- |
 | `DATABASE_URL` | Everything. Migrations run on each deploy. |
 | `AUTH_SECRET` | Sign-in sessions and sealing integration secrets. 32+ random characters. |
-| `APP_URL` | Links and Twilio webhooks, e.g. `https://tenurage.aultrum.co.uk`. |
+| `APP_URL` | Links and Twilio webhooks, e.g. `https://app.tenurage.com`. When it starts with `app.`, the same domain without it (tenurage.com, www.tenurage.com) serves the landing page and sends sign-in and the app to APP_URL. |
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` | Linkbot texting. Tenurage buys each agency's UK mobile number itself, under the account's approved UK mobile regulatory bundle, which it finds through Twilio's API. |
 | `TWILIO_API_KEY_SID`, `TWILIO_API_KEY_SECRET` | Recommended: a Twilio API key (Console → Account → API keys & tokens → Create API key, Standard). Requests to Twilio use it instead of the auth token, which then only checks incoming texts. |
 | `TWILIO_FROM` | Optional: a shared number to text from until an agency's own number is bought. |

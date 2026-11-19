@@ -1,8 +1,8 @@
 import { headers } from "next/headers";
 
-/** Where Pleasant lives when nothing else says: production, or the local dev server. */
+/** Where the Tenurage app lives when nothing else says: production, or the local dev server. */
 export function defaultOrigin(): string {
-  return process.env.NODE_ENV === "production" ? "https://tenurage.aultrum.co.uk" : "http://localhost:3000";
+  return process.env.NODE_ENV === "production" ? "https://app.tenurage.com" : "http://localhost:3000";
 }
 
 /**

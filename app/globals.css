@@ -137,3 +137,14 @@
   .sky, .sky > i { animation: none; }
   html { scroll-behavior: auto; }
 }
+
+/* Texts arriving one after another on the landing page. */
+.text-in {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: text-in 0.5s ease-out forwards;
+}
+@keyframes text-in { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .text-in { opacity: 1; transform: none; animation: none; }
+}
